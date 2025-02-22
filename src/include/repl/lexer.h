@@ -7,9 +7,11 @@
 #include <string>
 #include <utility>
 
+struct Token;
+
 class Lexer {
     std::string text;
-    unsigned int pos{};
+    int pos{-1};
 
 public:
     explicit Lexer(std::string text)
@@ -18,7 +20,20 @@ public:
 
     ~Lexer() = default;
 
+    Token nextToken();
+
+    Token peekToken();
+
+private:
     void advance();
+
+    void skipWhiteSpace();
+
+    [[nodiscard]] char currentChar() const;
+
+    [[nodiscard]] Token number() ;
+
+    [[nodiscard]] Token identifier() ;
 };
 
 #endif //LEXER_H

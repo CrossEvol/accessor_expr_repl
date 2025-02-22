@@ -6,30 +6,30 @@ set(COMPILER_CHOICE "clang" CACHE STRING "Choose compiler: gcc, clang, or msvc")
 set_property(CACHE COMPILER_CHOICE PROPERTY STRINGS gcc clang msvc)
 
 # Use the compiler choice to set the compiler
-if(COMPILER_CHOICE STREQUAL "clang")
+if (COMPILER_CHOICE STREQUAL "clang")
     set(CMAKE_C_COMPILER clang)
     set(CMAKE_CXX_COMPILER clang++)
 
     # Check if environment variables exist
-    if(DEFINED ENV{clang_include} AND DEFINED ENV{clang_lib})
+    if (DEFINED ENV{clang_include} AND DEFINED ENV{clang_lib})
         include_directories($ENV{clang_include})
         link_directories($ENV{clang_lib})
-    else()
+    else ()
         message(FATAL_ERROR "clang_include and/or clang_lib environment variables are not set")
-    endif()
+    endif ()
 
     set(CMAKE_GENERATOR "MSYS Makefiles")
 
-elseif(COMPILER_CHOICE STREQUAL "gcc")
+elseif (COMPILER_CHOICE STREQUAL "gcc")
     set(CMAKE_C_COMPILER gcc)
     set(CMAKE_CXX_COMPILER g++)
 
     set(CMAKE_GENERATOR "MinGW Makefiles")
 
-elseif(COMPILER_CHOICE STREQUAL "msvc")
+elseif (COMPILER_CHOICE STREQUAL "msvc")
     # MSVC is automatically set on Windows when using Visual Studio
     # No need to set compiler explicitly
-endif()
+endif ()
 
 project(repl)
 
@@ -68,7 +68,7 @@ FetchContent_MakeAvailable(fmt GTest)
 ############################################################
 file(GLOB REPL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/repl/*.cpp)
 add_library(repl_library STATIC
-       ${REPL_SOURCES}
+        ${REPL_SOURCES}
 )
 add_library(repl::library ALIAS repl_library)
 
@@ -88,48 +88,48 @@ target_link_libraries(repl_library
 
 # Debug executable
 add_executable(repl_debug src/main.cpp)
-set_target_properties(repl_debug PROPERTIES 
-    OUTPUT_NAME "repl"
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}
-    COMPILE_FLAGS ${CMAKE_CXX_FLAGS_DEBUG}
+set_target_properties(repl_debug PROPERTIES
+        OUTPUT_NAME "repl"
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}
+        COMPILE_FLAGS ${CMAKE_CXX_FLAGS_DEBUG}
 )
 
 target_include_directories(repl_debug
-    PUBLIC
-    ${PROJECT_SOURCE_DIR}/src/include
+        PUBLIC
+        ${PROJECT_SOURCE_DIR}/src/include
 )
 
 target_link_libraries(repl_debug
-    PRIVATE
-    repl::library
-    fmt::fmt-header-only
+        PRIVATE
+        repl::library
+        fmt::fmt-header-only
 )
 
 # Release executable
 add_executable(repl_release src/main.cpp)
-set_target_properties(repl_release PROPERTIES 
-    OUTPUT_NAME "repl"
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}
-    COMPILE_FLAGS ${CMAKE_CXX_FLAGS_RELEASE}
+set_target_properties(repl_release PROPERTIES
+        OUTPUT_NAME "repl"
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}
+        COMPILE_FLAGS ${CMAKE_CXX_FLAGS_RELEASE}
 )
 
 target_include_directories(repl_release
-    PUBLIC
-    ${PROJECT_SOURCE_DIR}/src/include
+        PUBLIC
+        ${PROJECT_SOURCE_DIR}/src/include
 )
 
 target_link_libraries(repl_release
-    PRIVATE
-    repl::library
-    fmt::fmt-header-only
+        PRIVATE
+        repl::library
+        fmt::fmt-header-only
 )
 
 ############################################################
 # Create Test executable
 ############################################################
-
+file(GLOB TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp)
 add_executable(unit_tests
-        test/unit_tests.cpp
+        ${TEST_SOURCES}
 )
 
 set_target_properties(unit_tests PROPERTIES
@@ -152,9 +152,9 @@ target_link_libraries(unit_tests PRIVATE
 ############################################################
 # Add LLVM only for clang compiler
 ############################################################
-if(COMPILER_CHOICE STREQUAL "clang")
+if (COMPILER_CHOICE STREQUAL "clang")
     target_link_libraries(repl_library PRIVATE LLVM-19)
     target_link_libraries(repl_debug PRIVATE LLVM-19)
     target_link_libraries(repl_release PRIVATE LLVM-19)
     target_link_libraries(unit_tests PRIVATE LLVM-19)
-endif()
+endif ()
