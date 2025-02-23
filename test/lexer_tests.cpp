@@ -53,8 +53,8 @@ TEST(LexerTest, NumberToken) {
     Token token = lexer.nextToken();
     EXPECT_EQ(token.type, TokenType::NUMBER);
     // The number token value is stored as a string.
-    auto numValue = std::get<std::string>(token.value);
-    EXPECT_EQ(numValue, "98765");
+    auto numValue = std::get<int>(token.value);
+    EXPECT_EQ(numValue, 98765);
 
     token = lexer.nextToken();
     EXPECT_EQ(token.type, TokenType::EOF_);
@@ -89,8 +89,8 @@ TEST(LexerTest, SkipsWhiteSpace) {
 
     token = lexer.nextToken();
     EXPECT_EQ(token.type, TokenType::NUMBER);
-    auto numValue = std::get<std::string>(token.value);
-    EXPECT_EQ(numValue, "123");
+    auto numValue = std::get<int>(token.value);
+    EXPECT_EQ(numValue, 123);
 
     token = lexer.nextToken();
     EXPECT_EQ(token.type, TokenType::EOF_);

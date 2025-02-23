@@ -85,7 +85,16 @@ Token Lexer::number() {
         chars.push_back(this->currentChar());
         this->advance();
     }
-    auto number = std::string(chars.begin(), chars.end());
+    // should revert one pos, or not it will be conflicted with
+    // Token Lexer::nextToken() {
+    //     this->advance();
+    //     //...
+    // }
+    if(!chars.empty()) {
+        this->pos--;
+    }
+    const auto number_string = std::string(chars.begin(), chars.end());
+    auto number = std::stoi(number_string);
     return {TokenType::NUMBER, number};
 }
 
@@ -94,6 +103,14 @@ Token Lexer::identifier() {
     while (this->pos < this->text.size() && isalnum(this->currentChar())) {
         chars.push_back(this->currentChar());
         this->advance();
+    }
+    // should revert one pos, or not it will be conflicted with
+    // Token Lexer::nextToken() {
+    //     this->advance();
+    //     //...
+    // }
+    if (!chars.empty()) {
+        this->pos--;
     }
     auto identifier = std::string(chars.begin(), chars.end());
     if (identifier == "nil") {
