@@ -1,7 +1,19 @@
 # Intro
-simple start up with test frameworks <br/>
-used catch2 before, but can not work well with msys-clang, so google-test instead. <br/>
-the Makefile can not be used by the make command. so the debug-build and release-build only can be integrated with the CLion.
+this repo is for repl of the nested accessor such as `a.b[0].c.d[1]`
+
+design a very simple commandline repl program
+
+below is its grammar:
+```text
+$x =  1 
+$array = @[1,2,]
+@map = @{k1 = 1, k2 = 2,}
+$y = nil
+array[0] = map
+array[0].k1
+```
+
+for simplicity, it does not take auto resizing for array and auto inserting for hash-map which are commonly seen in dynamic language into consideration
 
 # Link
 - [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html) 

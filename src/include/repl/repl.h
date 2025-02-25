@@ -6,7 +6,7 @@
 #define REPL_H
 
 namespace REPL {
-    void Start();
+    [[noreturn]] void Start();
 }
 
 #endif //REPL_H

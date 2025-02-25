@@ -47,9 +47,9 @@ TEST_F(ParserTest, ParsesPropertyAccess) {
 
     std::unique_ptr<Expr> a = std::make_unique<Variable>("a");
     std::unique_ptr<Expr> b = std::make_unique<Symbol>("b");
-    std::unique_ptr<Expr> a_b = std::make_unique<AccessorExpr>(a, b);
+    std::unique_ptr<Expr> a_b = std::make_unique<GetterExpr>(a, b);
     std::unique_ptr<Expr> c = std::make_unique<Symbol>("c");
-    auto expected = std::make_unique<AccessorExpr>(a_b, c);
+    auto expected = std::make_unique<GetterExpr>(a_b, c);
 
     EXPECT_TRUE(*expr == *expected);
 }
@@ -116,7 +116,7 @@ TEST_F(ParserTest, ParsesArrayAccess) {
 
     std::unique_ptr<Expr> a = std::make_unique<Variable>("a");
     std::unique_ptr<Expr> one = std::make_unique<NumberLiteral>(1);
-    std::unique_ptr<Expr> a_1 = std::make_unique<AccessorExpr>(a, one);
+    std::unique_ptr<Expr> a_1 = std::make_unique<GetterExpr>(a, one);
     std::unique_ptr<Expr> two = std::make_unique<NumberLiteral>(2);
     auto expected = std::make_unique<GetterExpr>(a_1, two);
 
@@ -128,13 +128,13 @@ TEST_F(ParserTest, ParsesMixedPropertyAndArrayAccess) {
 
     std::unique_ptr<Expr> a = std::make_unique<Variable>("a");
     std::unique_ptr<Expr> b = std::make_unique<Symbol>("b");
-    std::unique_ptr<Expr> a_b = std::make_unique<AccessorExpr>(a, b);
+    std::unique_ptr<Expr> a_b = std::make_unique<GetterExpr>(a, b);
     std::unique_ptr<Expr> one = std::make_unique<NumberLiteral>(1);
-    std::unique_ptr<Expr> a_b_1 = std::make_unique<AccessorExpr>(a_b, one);
+    std::unique_ptr<Expr> a_b_1 = std::make_unique<GetterExpr>(a_b, one);
     std::unique_ptr<Expr> c = std::make_unique<Symbol>("c");
-    std::unique_ptr<Expr> a_b_1_c = std::make_unique<AccessorExpr>(a_b_1, c);
+    std::unique_ptr<Expr> a_b_1_c = std::make_unique<GetterExpr>(a_b_1, c);
     std::unique_ptr<Expr> d = std::make_unique<Symbol>("d");
-    std::unique_ptr<Expr> a_b_1_c_d = std::make_unique<AccessorExpr>(a_b_1_c, d);
+    std::unique_ptr<Expr> a_b_1_c_d = std::make_unique<GetterExpr>(a_b_1_c, d);
     std::unique_ptr<Expr> two = std::make_unique<NumberLiteral>(2);
     auto expected = std::make_unique<GetterExpr>(a_b_1_c_d, two);
 

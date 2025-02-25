@@ -106,12 +106,12 @@ std::unique_ptr<Expr> Parser::accessor_expr() {
         if (token_type == TokenType::DOT) {
             this->consume(TokenType::DOT);
             std::unique_ptr<Expr> accessor = this->symbol();
-            instance = std::make_unique<AccessorExpr>(instance, accessor);
+            instance = std::make_unique<GetterExpr>(instance, accessor);
         }
         if (token_type == TokenType::LEFT_SQUARE) {
             this->consume(TokenType::LEFT_SQUARE);
             std::unique_ptr<Expr> accessor = this->number();
-            instance = std::make_unique<AccessorExpr>(instance, accessor);
+            instance = std::make_unique<GetterExpr>(instance, accessor);
             this->consume(TokenType::RIGHT_SQUARE);
         }
     }
@@ -125,8 +125,8 @@ std::unique_ptr<Expr> Parser::accessor_expr() {
         return std::make_unique<Assignment>(variable, rhs);
     }
 
-    auto *accessor_ptr = dynamic_cast<AccessorExpr *>(instance.get());
-    if (!accessor_ptr) {
+    auto *getter_ptr = dynamic_cast<GetterExpr *>(instance.get());
+    if (!getter_ptr) {
         throw std::runtime_error("Expected AccessorExpr");
     }
 
@@ -134,8 +134,8 @@ std::unique_ptr<Expr> Parser::accessor_expr() {
     auto value = this->rhs();
 
     return std::make_unique<SetterExpr>(
-        accessor_ptr->instance,
-        accessor_ptr->accessor,
+        getter_ptr->instance,
+        getter_ptr->accessor,
         value
     );
 }
