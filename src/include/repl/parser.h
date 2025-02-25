@@ -81,7 +81,7 @@ public:
 
     std::unique_ptr<ArrayDefinition> array_definition();
 
-    std::unique_ptr<AccessorExpr> accessor_expr();
+    std::unique_ptr<Expr> accessor_expr();
 
     std::unique_ptr<PrintStatement> print_stmt();
 

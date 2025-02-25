@@ -26,7 +26,7 @@ std::unique_ptr<Expr> Parser::expr() {
     if (token.type == TokenType::DOLLAR) {
         return this->declaration();
     }
-    if(token.type == TokenType::AT) {
+    if (token.type == TokenType::AT) {
         return this->definition();
     }
     if (token.type == TokenType::NUMBER || token.type == TokenType::NIL) {
@@ -36,13 +36,7 @@ std::unique_ptr<Expr> Parser::expr() {
         return this->print_stmt();
     }
     if (token.type == TokenType::IDENTIFIER) {
-        try {
-            return this->rhs();
-        } catch (const ParserError &err) {
-            if (err.error_type == ParseErrorType::EXPECT_EXPR_BUT_INDEED_ASSIGN) {
-                return this->assign_expr();
-            }
-        }
+        return this->rhs();
     }
     return this->empty_stmt();
 }
@@ -56,10 +50,7 @@ std::unique_ptr<Declaration> Parser::declaration() {
 }
 
 std::unique_ptr<Assignment> Parser::assign_expr() {
-    auto lhs = std::move(std::get<std::unique_ptr<Expr> >(this->prev_lhs));
-    this->consume(TokenType::EQ);
-    auto rhs = this->rhs();
-    return std::make_unique<Assignment>(lhs, rhs);
+    throw std::logic_error("Not implemented");
 }
 
 std::unique_ptr<Expr> Parser::definition() {
@@ -106,9 +97,11 @@ std::unique_ptr<ArrayDefinition> Parser::array_definition() {
     return std::make_unique<ArrayDefinition>(std::move(elements));
 }
 
-std::unique_ptr<AccessorExpr> Parser::accessor_expr() {
+std::unique_ptr<Expr> Parser::accessor_expr() {
     std::unique_ptr<Expr> instance = this->variable();
+    auto is_accessor = false;
     while (this->current_token.type == TokenType::DOT || this->current_token.type == TokenType::LEFT_SQUARE) {
+        is_accessor = true;
         const auto token_type = this->current_token.type;
         if (token_type == TokenType::DOT) {
             this->consume(TokenType::DOT);
@@ -122,12 +115,29 @@ std::unique_ptr<AccessorExpr> Parser::accessor_expr() {
             this->consume(TokenType::RIGHT_SQUARE);
         }
     }
-    if (this->current_token.type == TokenType::EQ) {
-        this->prev_lhs = std::move(instance);
-        throw ParserError(ParseErrorType::EXPECT_EXPR_BUT_INDEED_ASSIGN);
+    if (this->current_token.type != TokenType::EQ) {
+        return instance;
     }
-    std::unique_ptr<Expr> self = std::make_unique<Self>();
-    return std::make_unique<AccessorExpr>(instance, self);
+    if (!is_accessor) {
+        this->consume(TokenType::EQ);
+        auto rhs = this->rhs();
+        auto variable = std::make_unique<Variable>(*dynamic_cast<Variable *>(instance.get()));
+        return std::make_unique<Assignment>(variable, rhs);
+    }
+
+    auto *accessor_ptr = dynamic_cast<AccessorExpr *>(instance.get());
+    if (!accessor_ptr) {
+        throw std::runtime_error("Expected AccessorExpr");
+    }
+
+    this->consume(TokenType::EQ);
+    auto value = this->rhs();
+
+    return std::make_unique<SetterExpr>(
+        accessor_ptr->instance,
+        accessor_ptr->accessor,
+        value
+    );
 }
 
 std::unique_ptr<PrintStatement> Parser::print_stmt() {
@@ -145,8 +155,7 @@ std::unique_ptr<Expr> Parser::rhs() {
         return this->literal();
     }
     if (token.type == TokenType::IDENTIFIER) {
-        const auto accessorExpr = this->accessor_expr();
-        return  std::move(accessorExpr->instance);
+        return this->accessor_expr();
     }
     throw ParserError(ParseErrorType::UNKNOWN_RHS);
 }

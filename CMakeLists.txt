@@ -33,7 +33,7 @@ endif ()
 
 project(repl)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 # Debug/Release configuration settings
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0 -Wall")
@@ -147,6 +147,7 @@ target_include_directories(unit_tests
 target_link_libraries(unit_tests PRIVATE
         repl::library
         GTest::gtest_main
+        fmt::fmt-header-only
 )
 
 ############################################################
